@@ -15,16 +15,22 @@ JOKE = (
 )
 
 
+def resolve_output_path() -> str:
+    """Return the full path of entry.txt.
+
+    MAKEFUN_OUTPUT_DIR is a directory; if it already names the file
+    itself (ends with entry.txt), use it as-is, otherwise join it.
+    The unset-variable fallback is the /output directory.
+    """
+    raw = os.environ.get("MAKEFUN_OUTPUT_DIR") or "/output"
+    if raw.endswith("entry.txt"):
+        return raw
+    return os.path.join(raw, "entry.txt")
+
+
 def main() -> None:
-    output_dir = os.environ.get("MAKEFUN_OUTPUT_DIR") or "/output/entry.txt"
-    # MAKEFUN_OUTPUT_DIR is a directory; /output/entry.txt is the fallback path.
-    if output_dir.endswith("entry.txt"):
-        path = output_dir
-        directory = os.path.dirname(path)
-    else:
-        directory = output_dir
-        path = os.path.join(directory, "entry.txt")
-    os.makedirs(directory, exist_ok=True)
+    path = resolve_output_path()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write(JOKE + "\n")
 
